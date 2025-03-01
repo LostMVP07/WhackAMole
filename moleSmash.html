@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whack-a-Mole</title>
+  </head>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: monospace;
+    }
+    :root {
+      --main-color: #90ee90;
+    }
+    body {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      background-color: rgb(22, 22, 22);
+      margin: 0;
+    }
+    .main-container {
+      height: 100vh;
+      width: max-content;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 800px;
+      height: 800px;
+      box-shadow: 0 0 0 2px var(--main-color);
+    }
+    .square {
+      user-select: none;
+      height: 25%;
+      width: 25%;
+      border: solid var(--main-color);
+      box-shadow: 0 0 15px var(--main-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .mole {
+      -webkit-user-drag: none;
+      width: 80%;
+      height: 80%;
+      border-radius: 50%;
+      cursor: pointer;
+      transform: translateY(110%);
+      transition: 0.5s;
+    }
+    .btns {
+      display: flex;
+      gap: 20px;
+    }
+    .btn {
+      width: 120px;
+      height: 50px;
+      font-size: 1.5em;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      transform: scale(1.1);
+    }
+    .btn:active {
+      transform: translateY(-2px);
+    }
+    #slow {
+      background-color: rgb(100, 160, 100);
+    }
+    #medium {
+      background-color: rgb(150, 155, 100);
+    }
+    #fast {
+      background-color: rgb(160, 70, 100);
+    }
+    #score {
+      color: var(--main-color);
+    }
+    #currentScore {
+      font-size: 40px;
+    }
+    .colors-cont {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: var(--main-color);
+
+    }
+
+
+    @media (max-width: 1500px) {
+      .container {
+        width: 600px;
+        height: 600px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column-reverse;
+        
+      }
+      .colors-cont{
+        position: absolute;
+        top: 20px;
+      }
+      .container {
+        width: 300px;
+        height: 300px;
+      }
+      .btn {
+        width: 80px;
+        height: 30px;
+        font-size: 0.7em;
+      }
+      #score {
+        position: absolute;
+        bottom: 20px;
+      }
+    }
+  </style>
+  <body>
+    <div class="main-container">
+      <div class="container">
+        <div id="square1" class="square"></div>
+        <div id="square2" class="square"></div>
+        <div id="square3" class="square"></div>
+        <div id="square4" class="square"></div>
+        <div id="square5" class="square"></div>
+        <div id="square6" class="square"></div>
+        <div id="square7" class="square"></div>
+        <div id="square8" class="square"></div>
+        <div id="square9" class="square"></div>
+        <div id="square10" class="square"></div>
+        <div id="square11" class="square"></div>
+        <div id="square12" class="square"></div>
+        <div id="square13" class="square"></div>
+        <div id="square14" class="square"></div>
+        <div id="square15" class="square"></div>
+        <div id="square16" class="square"></div>
+      </div>
+
+      <div class="btns">
+        <button id="slow" class="btn">Slow 🙂</button>
+        <button id="medium" class="btn">Medium 😐</button>
+        <button id="fast" class="btn">Fast 🥵</button>
+      </div>
+    </div>
+
+    <h1 id="score">Score: <span id="currentScore">0</span>/10</h1>
+
+    <div class="colors-cont">
+      <label for="colors">Color adjust</label>
+      <input type="color" id="colors" style="cursor: pointer;"/>
+    </div>
+
+    <script>
+      const squares = document.querySelectorAll(".square");
+      const currentScore = document.getElementById("currentScore");
+      const colors = document.getElementById("colors");
+      colors.value = "#90ee90";
+
+      const slow = document.getElementById("slow");
+      const medium = document.getElementById("medium");
+      const fast = document.getElementById("fast");
+
+      const btn = document.querySelectorAll(".btn");
+
+
+      let jumpCount = 0;
+      let score = 0;
+      let clickCount = 0;
+      let isGameStared = false;
+
+
+      function scoreUpdate() {
+        currentScore.textContent = score;
+      }
+      btn.forEach((b) => {
+        b.addEventListener("click", function () {
+          if (b.classList.contains("clicked")) {
+            b.classList.remove("clicked");
+          } else {
+            btn.forEach((b2) => {
+              b2.classList.remove("clicked");
+              b2.disabled = true;
+            });
+            b.classList.add("clicked");
+            b.disabled = false;
+          }
+        });
+      });
+
+      function enableBtns() {
+        slow.disabled = false;
+        medium.disabled = false;
+        fast.disabled = false;
+      }
+
+      squares.forEach((square) => {
+        const mole = document.createElement("img");
+        mole.src = "pic/mole.png";
+        mole.alt = "mole";
+        mole.classList = "mole";
+
+        square.appendChild(mole);
+      });
+
+      function startGame(speed, slideDownSpeed) {
+        let interval = setInterval(function () {
+          const randomNumber = Math.floor(Math.random() * 16);
+          const randomSquare = squares[randomNumber];
+          const randomMole = randomSquare.querySelector(".mole");
+
+          jumpCount++
+          console.log(jumpCount)
+          randomMole.addEventListener("click", function () {
+            clickCount++;
+            if (clickCount < 2) {
+              score++;
+            }
+            scoreUpdate();
+          });
+          setTimeout(function () {
+            clickCount = 0;
+          }, 50);
+
+          randomMole.style.transform = "translateY(0%)";
+
+          setTimeout(function () {
+            randomMole.style.transform = "translateY(110%)";
+          }, slideDownSpeed);
+
+
+          if(jumpCount == 10){
+            jumpCount = 0;
+          setTimeout(function () {
+            alert(`Game over! your score is ${score}`);
+            clearInterval(interval);
+            isGameStared = false;
+            score = 0;
+            scoreUpdate();
+            enableBtns();
+          }, 1000);
+  
+        }
+
+
+
+        }, speed);
+
+      
+      }
+
+      slow.addEventListener("click", function () {
+        if (isGameStared) return;
+        isGameStared = true;
+        startGame(3000, 1000);
+      });
+      medium.addEventListener("click", function () {
+        if (isGameStared) return;
+        isGameStared = true;
+
+        startGame(2000, 700);
+      });
+      fast.addEventListener("click", function () {
+        if (isGameStared) return;
+        isGameStared = true;
+        startGame(1500, 500);
+      });
+
+      colors.addEventListener("input", function () {
+        let color = colors.value;
+        document.documentElement.style.setProperty("--main-color", color);
+      });
+    </script>
+  </body>
+</html>
