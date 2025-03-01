@@ -97,9 +97,7 @@
       align-items: center;
       gap: 10px;
       color: var(--main-color);
-
     }
-
 
     @media (max-width: 1500px) {
       .container {
@@ -111,9 +109,8 @@
     @media (max-width: 900px) {
       body {
         flex-direction: column-reverse;
-        
       }
-      .colors-cont{
+      .colors-cont {
         position: absolute;
         top: 20px;
       }
@@ -164,7 +161,7 @@
 
     <div class="colors-cont">
       <label for="colors">Color adjust</label>
-      <input type="color" id="colors" style="cursor: pointer;"/>
+      <input type="color" id="colors" style="cursor: pointer" />
     </div>
 
     <script>
@@ -179,12 +176,10 @@
 
       const btn = document.querySelectorAll(".btn");
 
-
       let jumpCount = 0;
       let score = 0;
       let clickCount = 0;
       let isGameStared = false;
-
 
       function scoreUpdate() {
         currentScore.textContent = score;
@@ -225,8 +220,7 @@
           const randomSquare = squares[randomNumber];
           const randomMole = randomSquare.querySelector(".mole");
 
-          jumpCount++
-          console.log(jumpCount)
+          jumpCount++;
           randomMole.addEventListener("click", function () {
             clickCount++;
             if (clickCount < 2) {
@@ -244,42 +238,35 @@
             randomMole.style.transform = "translateY(110%)";
           }, slideDownSpeed);
 
-
-          if(jumpCount == 10){
+          if (jumpCount == 10) {
             jumpCount = 0;
-          setTimeout(function () {
-            alert(`Game over! your score is ${score}`);
-            clearInterval(interval);
-            isGameStared = false;
-            score = 0;
-            scoreUpdate();
-            enableBtns();
-          }, 1000);
-  
-        }
-
-
-
+            setTimeout(function () {
+              alert(`Game over! your score is ${score}`);
+              clearInterval(interval);
+              isGameStared = false;
+              score = 0;
+              scoreUpdate();
+              enableBtns();
+            }, 1000);
+          }
         }, speed);
-
-      
       }
 
       slow.addEventListener("click", function () {
         if (isGameStared) return;
         isGameStared = true;
-        startGame(3000, 1000);
+        startGame(2000, 800);
       });
       medium.addEventListener("click", function () {
         if (isGameStared) return;
         isGameStared = true;
 
-        startGame(2000, 700);
+        startGame(1500, 500);
       });
       fast.addEventListener("click", function () {
         if (isGameStared) return;
         isGameStared = true;
-        startGame(1500, 500);
+        startGame(1000, 200);
       });
 
       colors.addEventListener("input", function () {
